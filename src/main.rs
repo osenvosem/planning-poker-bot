@@ -7,6 +7,7 @@ use db::{EstimationWithUser, SessionWithInitiator};
 use dotenv::dotenv;
 use rand::Rng;
 use rusqlite::Result;
+use std::env;
 use std::error::Error;
 use teloxide::{
     prelude::*,
@@ -30,7 +31,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     dotenv().ok();
     pretty_env_logger::init();
 
-    let conn = Connection::open("poker.db").await.unwrap();
+    let exec_dir = env::current_exe()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .display()
+        .to_string();
+    let conn = Connection::open(format!("{exec_dir}/poker.db"))
+        .await
+        .unwrap();
 
     conn.call(db::prepare_database).await?;
 
